@@ -4,7 +4,8 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import path from 'path';
 import IntlWrapper from '../client/modules/Intl/IntlWrapper';
-
+import * as ClientMiddleWare from  '../server/middleware/client.middleware';
+import  firebase from 'firebase';
 // Webpack Requirements
 import webpack from 'webpack';
 import config from '../webpack.config.dev';
@@ -21,6 +22,11 @@ if (process.env.NODE_ENV === 'development') {
   app.use(webpackHotMiddleware(compiler));
 }
 
+firebase.initializeApp({
+  serviceAccount: path.resolve('./server/serviceAccountCredentials.json'),
+  databaseURL: 'https://areyoubored-af965.firebaseio.com'
+});
+
 // React And Redux Setup
 import { configureStore } from '../client/store';
 import { Provider } from 'react-redux';
@@ -33,8 +39,14 @@ import Helmet from 'react-helmet';
 import routes from '../client/routes';
 import { fetchComponentData } from './util/fetchData';
 import posts from './routes/post.routes';
+import venueRouter from './routes/venue.routes';
+
 import dummyData from './dummyData';
 import serverConfig from './config';
+
+// Prepare CheckFront API Authorization Token:
+serverConfig.Authorization = `Basic ${new Buffer(serverConfig.API_KEY + ':' + serverConfig.API_SECRET).toString('base64')}`;
+console.info('Authorization:', serverConfig.Authorization);
 
 // Set native promises as mongoose promise
 mongoose.Promise = global.Promise;
@@ -55,6 +67,8 @@ app.use(compression());
 app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
 app.use(Express.static(path.resolve(__dirname, '../dist')));
+app.use('/newAPI', ClientMiddleWare.checkFirebaseClient);
+app.use('/newAPI', venueRouter);
 app.use('/api', posts);
 
 // Render Initial HTML
