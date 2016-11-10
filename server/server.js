@@ -11,6 +11,8 @@ import webpack from 'webpack';
 import config from '../webpack.config.dev';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
+import serverConfig from './config';
+import * as venueCtrl from './controllers/venue.controller';
 
 // Initialize the Express App
 const app = new Express();
@@ -22,10 +24,12 @@ if (process.env.NODE_ENV === 'development') {
   app.use(webpackHotMiddleware(compiler));
 }
 
-firebase.initializeApp({
-  serviceAccount: path.resolve('./server/serviceAccountCredentials.json'),
-  databaseURL: 'https://areyoubored-af965.firebaseio.com'
-});
+firebase.initializeApp(serverConfig.Firebase);
+
+const db = firebase.database();
+serverConfig.db = db;
+serverConfig.ref = db.ref('/');
+venueCtrl.writeSampleVenues();
 
 // React And Redux Setup
 import { configureStore } from '../client/store';
@@ -42,7 +46,7 @@ import posts from './routes/post.routes';
 import venueRouter from './routes/venue.routes';
 
 import dummyData from './dummyData';
-import serverConfig from './config';
+
 
 // Prepare CheckFront API Authorization Token:
 serverConfig.Authorization = `Basic ${new Buffer(serverConfig.API_KEY + ':' + serverConfig.API_SECRET).toString('base64')}`;
@@ -52,15 +56,15 @@ console.info('Authorization:', serverConfig.Authorization);
 mongoose.Promise = global.Promise;
 
 // MongoDB Connection
-mongoose.connect(serverConfig.mongoURL, (error) => {
+/*mongoose.connect(serverConfig.mongoURL, (error) => {
   if (error) {
     console.error('Please make sure Mongodb is installed and running!'); // eslint-disable-line no-console
-    throw error;
+    // throw error;
   }
-
   // feed some dummy data in DB.
   dummyData();
 });
+*/
 
 // Apply body Parser and server public assets and routes
 app.use(compression());
