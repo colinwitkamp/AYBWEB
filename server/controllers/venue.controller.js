@@ -353,7 +353,7 @@ export function getTimeslots(req, res, next) {
         if (item.rate) {
           res.json({
             status: HttpStatus.OK,
-            rate: item.rate
+            data: item
           });
         } else {
           res.json({
@@ -478,8 +478,8 @@ export function bookItem(req, res, next) {
   const start_time = req.body.start_time;
   const end_time = req.body.end_time;
   const available = req.body.available;
-  console.info('Item query:', `${item_id}/?date=${date}&start_time=${start_time}&end_time=${end_time}&param[qty]={available}`);
-  axios.get(`${serverConfig.checkFrontURL}/${serverConfig.API_URL}/item/${item_id}/?date=${date}&start_time=${start_time}&end_time=${end_time}&param[qty]={available}`, {
+  console.info('Item query:', `${item_id}/?date=${date}&start_time=${start_time}&end_time=${end_time}&param[qty]=${available}`);
+  axios.get(`${serverConfig.checkFrontURL}/${serverConfig.API_URL}/item/${item_id}/?date=${date}&start_time=${start_time}&end_time=${end_time}&param[qty]=${available}`, {
     headers: {
       Authorization: serverConfig.Authorization
     }
@@ -529,8 +529,8 @@ export function queryItem(req, res, next) {
   const start_time = req.body.start_time;
   const end_time = req.body.end_time;
   const available = req.body.available;
-  console.info('Item query:', `${item_id}/?date=${date}&start_time=${start_time}&end_time=${end_time}&param[qty]={available}`);
-  axios.get(`${serverConfig.checkFrontURL}/${serverConfig.API_URL}/item/${item_id}/?date=${date}&start_time=${start_time}&end_time=${end_time}&param[qty]={available}`, {
+  console.info('Item query:', `${item_id}/?date=${date}&start_time=${start_time}&end_time=${end_time}&param[qty]=${available}`);
+  axios.get(`${serverConfig.checkFrontURL}/${serverConfig.API_URL}/item/${item_id}/?date=${date}&start_time=${start_time}&end_time=${end_time}&param[qty]=${available}`, {
     headers: {
       Authorization: serverConfig.Authorization
     }
